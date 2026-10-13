@@ -953,6 +953,11 @@
       "dependencies": {
         "@dnd-kit/core": "catalog:",
         "@dnd-kit/sortable": "catalog:",
+        "@fontsource-variable/jetbrains-mono": "catalog:",
+        "@fontsource-variable/space-grotesk": "catalog:",
+        "@fontsource/bebas-neue": "catalog:",
+        "@fontsource/dseg7-classic": "catalog:",
+        "@fontsource/orbitron": "catalog:",
         "@homarr/api": "workspace:^0.1.0",
         "@homarr/auth": "workspace:^0.1.0",
         "@homarr/boards": "workspace:^0.1.0",
@@ -1233,6 +1238,11 @@
     "@dnd-kit/utilities": "3.2.2",
     "@drizzle-team/brocli": "0.12.0",
     "@extractus/feed-extractor": "7.2.1",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@fontsource-variable/space-grotesk": "5.3.0",
+    "@fontsource/bebas-neue": "5.3.0",
+    "@fontsource/dseg7-classic": "5.3.0",
+    "@fontsource/orbitron": "5.3.0",
     "@gfazioli/mantine-onboarding-tour": "4.0.8",
     "@gitbeaker/rest": "^43.8.0",
     "@homarr/node-unifi": "2.6.0",
@@ -1722,6 +1732,16 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
 
     "@floating-ui/vue": ["@floating-ui/vue@1.1.9", "", { "dependencies": { "@floating-ui/dom": "1.8.0", "@floating-ui/utils": "0.2.12", "vue-demi": "0.14.10" } }, "sha512-BfNqNW6KA83Nexspgb9DZuz578R7HT8MZw1CfK9I6Ah4QReNWEJsXWHN+SdmOVLNGmTPDi+fDT535Df5PzMLbQ=="],
+
+    "@fontsource-variable/jetbrains-mono": ["@fontsource-variable/jetbrains-mono@5.3.0", "", {}, "sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw=="],
+
+    "@fontsource-variable/space-grotesk": ["@fontsource-variable/space-grotesk@5.3.0", "", {}, "sha512-2IxmvfB08i9vnGB3Ym/AXvhRE+8XOjWMXIyDum03c+tPwH0FUoMNQfGpU8NXPxjbws0Vvss3AH0Zqt4oJBBAdw=="],
+
+    "@fontsource/bebas-neue": ["@fontsource/bebas-neue@5.3.0", "", {}, "sha512-nCxMEb9Bg9sjNWm9TIOsvHKDMLRUfEZPWpLgYu6m9KavZZVSA/WoHzI5wROwqA+eNwEi/PNBAcB5Co7HA3S0Cw=="],
+
+    "@fontsource/dseg7-classic": ["@fontsource/dseg7-classic@5.3.0", "", {}, "sha512-Y7JJRPszb1DwL6EEA1QFyL8wev2o0K/Lt/9AR0Y/1/0Z/5+O7p8muJR4OeJr+HrmPoJB/20mF+vMu6WiQxmtmQ=="],
+
+    "@fontsource/orbitron": ["@fontsource/orbitron@5.3.0", "", {}, "sha512-+BhPsbUAo/AF7sRcf+TEexm+EWWkgTiR9Zwb7AhYIPkc5oplfvw0C45Oc2xlKPhwVEmxG8hHuA6/Ansbl+Bc6w=="],
 
     "@formatjs/ecma402-abstract": ["@formatjs/ecma402-abstract@3.1.0", "", { "dependencies": { "@formatjs/fast-memoize": "3.1.0", "@formatjs/intl-localematcher": "0.8.0", "decimal.js": "10.6.0", "tslib": "2.8.1" } }, "sha512-CjP1sUzM7XiQW6YluDreN+dMvcKZysO/J4ikvuDjDyd6nSOoSqAK9gvD1s75ZFaJVXtYOsz+y3CUXPZ1sKxcxw=="],
 
