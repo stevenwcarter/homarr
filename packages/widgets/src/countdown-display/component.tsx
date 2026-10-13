@@ -188,6 +188,7 @@ const CountdownProgress = ({ state, now, label }: { state: CountdownEventState; 
   if (progress === null) return null;
   return (
     <Progress
+      className={styles.progress}
       w="100%"
       maw="20rem"
       mt="xs"

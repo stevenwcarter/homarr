@@ -182,11 +182,14 @@ Hero (first event), rendered the same way in compact and advanced display modes:
 - Tiles: one per trimmed part, `Group` with `wrap="nowrap"`. Hour, minute and second values are
   zero-padded to two digits; other units are not padded. Numerals use
   `font-variant-numeric: tabular-nums`.
-- Auto-fit: `.root` is a size container. The component sets `--countdown-cells` (sum over the
-  tiles of `digits × 0.62 + 0.5` for the gap, a tunable constant) and `--countdown-scale`
-  (`scale / 100`) as inline custom properties. The numeral font size is
-  `calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), 30cqh))`, clamped to a
-  minimum of `1rem`. Labels are `0.22em` of the numeral size, minimum `0.6rem`.
+- Auto-fit: `.hero` and `.root` are size containers. The title, target line and progress bar do not
+  shrink; `.tilesHost` is itself a size container (`flex: 1 1 0`, `min-height: 0`, `overflow: hidden`)
+  that takes the leftover hero height. The component sets `--countdown-cells` (sum over the tiles of
+  `digits × cell + 0.5` for the gap, where `cell` is `0.62`, or `0.86` for the 7-segment font; tunable
+  constants) and `--countdown-scale` (`scale / 100`) as inline custom properties. The `.tiles` font
+  size is `calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), calc(100cqh / 1.45)))`
+  of `.tilesHost`, clamped to a minimum of `1rem` (1.45 is numeral 1em + label line + margin). The gap
+  is `0.3em` of that size, so it scales with the numerals. Labels are `0.22em`, minimum `0.6rem`.
 - Font: numerals get `style={{ fontFamily }}` from the registry (`undefined` for `default`), and
   the `.sevenSegment` class, which sets `font-weight: 700` and `letter-spacing: 0.04em`.
 - Glow: in the dark scheme `.glow` applies
@@ -198,8 +201,8 @@ Hero (first event), rendered the same way in compact and advanced display modes:
   "Completed" text (translated), no tiles. Empty event list → the same empty state copy pattern as
   the stock widget (hourglass icon, title, description).
 - Target line: `Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone })`
-  of the next (or previous) occurrence; hidden under `@container (max-height: 7rem)` and
-  `@container (max-width: 11rem)`.
+  of the next (or previous) occurrence; hidden under `@container (max-height: 9rem)` and
+  `@container (max-width: 12rem)`.
 - Progress: `Progress` with `getCountdownProgress`, shown only when `showProgress` and progress is
   not null.
 - Advanced mode (`displayMode === "advanced"`): hero in a bordered `Paper` taking the top, then a
@@ -208,7 +211,7 @@ Hero (first event), rendered the same way in compact and advanced display modes:
   `"1 month 14 days"` using the same unit labels, short form), optional progress, and the target
   line. Invalid events get the same yellow `Alert` as the stock widget.
 - `CountdownInline` is also what the hero falls back to when the container is narrower than
-  `8rem` (via a container query that swaps `display` of the two renderings).
+  `10rem` (a container query swaps `display` of the two renderings and hides the progress bar).
 
 ### Translations (`packages/translation/src/lang/en.json`, key `widget.countdownDisplay`)
 

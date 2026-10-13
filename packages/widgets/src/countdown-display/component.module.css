@@ -8,8 +8,26 @@
   min-width: 0;
 }
 
-.title {
+.title,
+.target {
+  flex: 0 0 auto;
   max-width: 100%;
+}
+
+.progress {
+  flex-shrink: 0;
+}
+
+/* Takes the height left over by the chrome; the tiles size themselves from this box. */
+.tilesHost {
+  container-type: size;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .status {
@@ -19,13 +37,17 @@
 .tiles {
   --countdown-cells: 6;
   --countdown-scale: 1;
+  /* Auto-fit against .tilesHost: 84% of its width shared across the digit cells, capped by its height
+     (numeral 1em + label ~0.3em + margin = ~1.45em), then scaled. The gap is in em so it follows. */
+  font-size: max(1rem, calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), calc(100cqh / 1.45))));
+  line-height: 1;
+  --group-gap: 0.3em;
+  gap: 0.3em;
   max-width: 100%;
 }
 
 .tile {
-  /* Auto-fit: share 84% of the container width across all digit cells, cap by height, then scale. */
-  font-size: max(1rem, calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), 30cqh)));
-  line-height: 1;
+  min-width: 0;
 }
 
 .numeral {
@@ -80,19 +102,17 @@
   display: none;
 }
 
-.target {
-  max-width: 100%;
-}
-
 .eventCard {
   min-width: 0;
 }
 
-.eventCard .inline {
+.eventCard .inline,
+.inlineHost .inline {
   white-space: normal;
+  text-align: center;
 }
 
-@container (max-width: 8rem) {
+@container (max-width: 10rem) {
   .tilesHost {
     display: none;
   }
@@ -100,15 +120,20 @@
   .inlineHost {
     display: block;
   }
+
+  /* No room for the progress bar next to the wrapped inline text. */
+  .hero .progress {
+    display: none;
+  }
 }
 
-@container (max-width: 11rem) {
+@container (max-width: 12rem) {
   .target {
     display: none;
   }
 }
 
-@container (max-height: 7rem) {
+@container (max-height: 9rem) {
   .target {
     display: none;
   }
