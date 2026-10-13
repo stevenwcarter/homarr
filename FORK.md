@@ -20,7 +20,8 @@ deployed. It is force-pushed after every rebase. Never push to `upstream`.
 Widget code (fork-only, never conflicts): `packages/widgets/src/countdown-display/**`, `FORK.md`,
 `docs/superpowers/**`, `apps/docs/docs/widgets/countdown-display/**`.
 
-Upstream files edited (conflicts land here):
+Upstream files edited (conflicts land here). The weekly-recurrence rows touch the stock Countdowns
+widget's shared code on purpose: both widgets use the same event editor and resolver.
 
 | File | Our change | On conflict |
 | --- | --- | --- |
@@ -33,6 +34,10 @@ Upstream files edited (conflicts land here):
 | `packages/translation/src/lang/en.json` | `widget.countdownDisplay` block after `widget.countdown` | keep both blocks; validate JSON. Must include a `dateTimeEventList` sub-block mirroring `widget.countdown.dateTimeEventList` (the event-list editor reads labels per widget kind; `translation.spec.ts` pins this) |
 | `package.json` (catalog), `packages/widgets/package.json`, `bun.lock` | five `@fontsource*` deps | keep both; run `bun install`, commit the lockfile |
 | `apps/docs/public/api/open-api-schema.json` | regenerated | take upstream, re-run `SKIP_ENV_VALIDATION=true bun run scripts:update-openapi` |
+| `packages/widgets/src/options.ts`, `packages/widgets/src/_inputs/widget-date-time-event-list-input.tsx` | `"weekly"` added to the `DateTimeEventRecurrence` type, zod enum, and the Repeats dropdown | keep `"weekly"` in every list; if upstream adds its own weekly recurrence, drop ours and adopt theirs |
+| `packages/widgets/src/countdown/recurrence.ts` | `findWeeklyOccurrence` + weekly branch in `getCountdownEventState`; progress uses previous/next for any recurrence | re-apply on top of upstream; `recurrence.spec.ts` weekly cases must pass |
+| `packages/widgets/src/countdown/component.tsx`, `packages/widgets/src/countdown/recurrence.spec.ts` | recurrence badge shows `t(recurrence)` for any non-`none` value; weekly tests | keep ours |
+| `apps/docs/docs/widgets/countdown/**` | "one-time, weekly, or yearly" wording | keep ours |
 | `README.md` | fork-only file (upstream v2.4.1 has no root README); if upstream re-adds one, keep our pointer at the top of theirs | keep ours at the top |
 
 ## Updating to a new Homarr release
