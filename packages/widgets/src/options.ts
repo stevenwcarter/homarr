@@ -127,7 +127,7 @@ interface TimezoneListInput extends CommonInput<OptionTimezone[]> {
   timeZoneOptions: readonly { value: string; label: string }[];
 }
 
-export type DateTimeEventRecurrence = "none" | "yearly";
+export type DateTimeEventRecurrence = "none" | "weekly" | "yearly";
 
 export interface OptionDateTimeEvent {
   id: string;
@@ -273,7 +273,7 @@ const optionsFactory = {
       targetUtc: z.iso.datetime(),
       timeZone: z.string().min(1),
       startUtc: z.iso.datetime().optional(),
-      recurrence: z.enum(["none", "yearly"]),
+      recurrence: z.enum(["none", "weekly", "yearly"]),
     });
 
     return {

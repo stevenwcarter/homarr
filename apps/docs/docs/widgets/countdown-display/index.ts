@@ -11,7 +11,7 @@ export const countdownDisplayWidget: WidgetDefinition = {
       {
         name: "Events",
         description:
-          "Add, edit, and order one-time or yearly events with a date, time, and IANA timezone. The first event is shown large.",
+          "Add, edit, and order one-time, weekly, or yearly events with a date, time, and IANA timezone. The first event is shown large.",
         values: "Up to 20 events",
         defaultValue: "No events",
       },
@@ -49,7 +49,7 @@ export const countdownDisplayWidget: WidgetDefinition = {
       },
       {
         name: "Show progress",
-        description: "Show progress from an optional start date, or between yearly occurrences.",
+        description: "Show progress from an optional start date, or between recurring occurrences.",
         values: { type: "boolean" },
         defaultValue: "yes",
       },

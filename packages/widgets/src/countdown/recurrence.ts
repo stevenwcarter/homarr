@@ -140,6 +140,41 @@ const occurrenceForYear = (target: WallDateTime, year: number, timeZone: string)
   return resolveWallDateTime({ ...target, year }, timeZone);
 };
 
+const weekMs = 7 * dayMs;
+
+const addWallDays = (wall: WallDateTime, days: number): WallDateTime => {
+  const shifted = new Date(Date.UTC(wall.year, wall.month - 1, wall.day + days, wall.hour, wall.minute, wall.second));
+  return {
+    year: shifted.getUTCFullYear(),
+    month: shifted.getUTCMonth() + 1,
+    day: shifted.getUTCDate(),
+    hour: wall.hour,
+    minute: wall.minute,
+    second: wall.second,
+  };
+};
+
+/**
+ * Steps whole weeks on the wall clock so the local time survives DST changes.
+ * The week count is estimated from the elapsed time and corrected by probing neighbours.
+ */
+const findWeeklyOccurrence = (
+  target: WallDateTime,
+  timeZone: string,
+  targetInstant: Date,
+  now: Date,
+  direction: 1 | -1,
+  predicate: (date: Date) => boolean,
+) => {
+  const estimate = Math.floor((now.getTime() - targetInstant.getTime()) / weekMs);
+  const start = estimate - 2 * direction;
+  for (let index = 0; index < 6; index += 1) {
+    const occurrence = resolveWallDateTime(addWallDays(target, (start + index * direction) * 7), timeZone);
+    if (occurrence && predicate(occurrence)) return occurrence;
+  }
+  return null;
+};
+
 const findYearlyOccurrence = (
   target: WallDateTime,
   timeZone: string,
@@ -176,21 +211,19 @@ export const getCountdownEventState = (event: OptionDateTimeEvent, now: Date): C
   if (!targetWall) {
     return { event, nextOccurrence: null, previousOccurrence: null, completed: false, invalid: true };
   }
-  const currentYear = dayjs(now).tz(event.timeZone).year();
-  const nextOccurrence = findYearlyOccurrence(
-    targetWall,
-    event.timeZone,
-    currentYear,
-    1,
-    (occurrence) => occurrence.getTime() > now.getTime(),
-  );
-  const previousOccurrence = findYearlyOccurrence(
-    targetWall,
-    event.timeZone,
-    currentYear,
-    -1,
-    (occurrence) => occurrence.getTime() <= now.getTime(),
-  );
+  const isNext = (occurrence: Date) => occurrence.getTime() > now.getTime();
+  const isPrevious = (occurrence: Date) => occurrence.getTime() <= now.getTime();
+  let nextOccurrence: Date | null;
+  let previousOccurrence: Date | null;
+  if (event.recurrence === "weekly") {
+    const targetInstant = target.toDate();
+    nextOccurrence = findWeeklyOccurrence(targetWall, event.timeZone, targetInstant, now, 1, isNext);
+    previousOccurrence = findWeeklyOccurrence(targetWall, event.timeZone, targetInstant, now, -1, isPrevious);
+  } else {
+    const currentYear = dayjs(now).tz(event.timeZone).year();
+    nextOccurrence = findYearlyOccurrence(targetWall, event.timeZone, currentYear, 1, isNext);
+    previousOccurrence = findYearlyOccurrence(targetWall, event.timeZone, currentYear, -1, isPrevious);
+  }
   return {
     event,
     nextOccurrence,
@@ -204,7 +237,7 @@ export const getCountdownProgress = (state: CountdownEventState, now: Date): num
   let start: Date | null = null;
   let end: Date | null = null;
 
-  if (state.event.recurrence === "yearly") {
+  if (state.event.recurrence !== "none") {
     start = state.previousOccurrence;
     end = state.nextOccurrence;
   } else if (state.event.startUtc) {

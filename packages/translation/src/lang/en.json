@@ -2658,7 +2658,7 @@
       "option": {
         "events": {
           "label": "Events",
-          "description": "Add and order up to 20 one-time or yearly countdowns. Dates are entered in the selected timezone."
+          "description": "Add and order up to 20 one-time, weekly, or yearly countdowns. Dates are entered in the selected timezone."
         },
         "showProgress": {
           "label": "Show progress"
@@ -2679,6 +2679,7 @@
         "recurrence": "Repeats",
         "recurrenceOption": {
           "none": "Does not repeat",
+          "weekly": "Every week",
           "yearly": "Every year"
         },
         "target": "Event date and time",
@@ -2692,6 +2693,7 @@
         "description": "Add an event in widget options to start counting down."
       },
       "completed": "Completed",
+      "weekly": "Weekly",
       "yearly": "Yearly",
       "progress": "Event progress",
       "upcoming": "Upcoming",
@@ -2713,7 +2715,7 @@
       "option": {
         "events": {
           "label": "Events",
-          "description": "Add and order up to 20 one-time or yearly countdowns. Dates are entered in the selected timezone. The first event is shown large."
+          "description": "Add and order up to 20 one-time, weekly, or yearly countdowns. Dates are entered in the selected timezone. The first event is shown large."
         },
         "units": {
           "label": "Units shown",
@@ -2746,6 +2748,7 @@
         "recurrence": "Repeats",
         "recurrenceOption": {
           "none": "Does not repeat",
+          "weekly": "Every week",
           "yearly": "Every year"
         },
         "target": "Event date and time",
@@ -2772,6 +2775,7 @@
         "description": "Add an event in widget options to start counting down."
       },
       "completed": "Completed",
+      "weekly": "Weekly",
       "yearly": "Yearly",
       "progress": "Event progress",
       "upcoming": "Upcoming",

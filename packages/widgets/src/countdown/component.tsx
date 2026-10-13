@@ -301,7 +301,7 @@ const EventSection = ({
                 <Text fw={600} truncate>
                   {state.event.label}
                 </Text>
-                {state.event.recurrence === "yearly" && <Badge variant="outline">{t("yearly")}</Badge>}
+                {state.event.recurrence !== "none" && <Badge variant="outline">{t(state.event.recurrence)}</Badge>}
               </Group>
               <CountdownValue state={state} now={now} locale={locale} showSeconds={showSeconds} compact />
               <Stack gap={4} mt="auto">

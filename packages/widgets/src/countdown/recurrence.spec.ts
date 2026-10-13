@@ -38,6 +38,41 @@ describe("countdown recurrence", () => {
     expect(state.previousOccurrence?.toISOString()).toBe("2024-02-29T12:00:00.000Z");
   });
 
+  it("finds the next and previous weekly occurrences", () => {
+    const weekly = event({ recurrence: "weekly", timeZone: "UTC" });
+    const state = getCountdownEventState(weekly, new Date("2026-08-01T00:00:00.000Z"));
+
+    expect(state.nextOccurrence?.toISOString()).toBe("2026-08-05T13:00:00.000Z");
+    expect(state.previousOccurrence?.toISOString()).toBe("2026-07-29T13:00:00.000Z");
+    expect(state.completed).toBe(false);
+    expect(state.invalid).toBe(false);
+  });
+
+  it("treats an occurrence reached exactly now as the previous one", () => {
+    const weekly = event({ recurrence: "weekly", timeZone: "UTC" });
+    const state = getCountdownEventState(weekly, new Date("2026-07-29T13:00:00.000Z"));
+
+    expect(state.previousOccurrence?.toISOString()).toBe("2026-07-29T13:00:00.000Z");
+    expect(state.nextOccurrence?.toISOString()).toBe("2026-08-05T13:00:00.000Z");
+  });
+
+  it("extends a weekly series before its anchor date, like yearly", () => {
+    const weekly = event({ recurrence: "weekly", timeZone: "UTC" });
+    const state = getCountdownEventState(weekly, new Date("2026-07-01T00:00:00.000Z"));
+
+    expect(state.nextOccurrence?.toISOString()).toBe("2026-07-01T13:00:00.000Z");
+    expect(state.previousOccurrence?.toISOString()).toBe("2026-06-24T13:00:00.000Z");
+  });
+
+  it("preserves a weekly event's wall-clock time across a DST change", () => {
+    // Monday 2026-03-02 19:00 EST; DST starts 2026-03-08 in Detroit.
+    const weekly = event({ recurrence: "weekly", targetUtc: "2026-03-03T00:00:00.000Z", timeZone: "America/Detroit" });
+    const state = getCountdownEventState(weekly, new Date("2026-03-10T00:00:00.000Z"));
+
+    expect(state.previousOccurrence?.toISOString()).toBe("2026-03-09T23:00:00.000Z");
+    expect(state.nextOccurrence?.toISOString()).toBe("2026-03-16T23:00:00.000Z");
+  });
+
   it("selects the first valid time after a DST gap", () => {
     const resolved = resolveWallDateTimeString("2026-03-08 02:30:45", "America/New_York");
     expect(resolved?.toISOString()).toBe("2026-03-08T07:00:00.000Z");
@@ -88,6 +123,13 @@ describe("countdown ordering and progress", () => {
     if (progress === null) throw new Error("Expected yearly progress");
     expect(progress).toBeGreaterThan(49);
     expect(progress).toBeLessThan(51);
+  });
+
+  it("uses the previous and next occurrence for weekly progress", () => {
+    const midweek = new Date("2026-08-02T01:00:00.000Z");
+    const state = getCountdownEventState(event({ recurrence: "weekly", timeZone: "UTC" }), midweek);
+
+    expect(getCountdownProgress(state, midweek)).toBe(50);
   });
 
   it("keeps seconds visible at every duration when enabled", () => {

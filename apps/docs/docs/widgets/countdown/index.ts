@@ -10,13 +10,13 @@ export const countdownWidget: WidgetDefinition = {
     items: [
       {
         name: "Events",
-        description: "Add, edit, and order one-time or yearly events with a date, time, and IANA timezone.",
+        description: "Add, edit, and order one-time, weekly, or yearly events with a date, time, and IANA timezone.",
         values: "Up to 20 events",
         defaultValue: "No events",
       },
       {
         name: "Show progress",
-        description: "Show progress from an optional start date, or between yearly occurrences.",
+        description: "Show progress from an optional start date, or between recurring occurrences.",
         values: { type: "boolean" },
         defaultValue: "yes",
       },

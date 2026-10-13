@@ -218,7 +218,10 @@ const SortableEvent = ({ kind, event, timeZoneOptions, onChange, onRemove }: Sor
           <Select
             label={t("recurrence")}
             value={event.recurrence}
-            data={(["none", "yearly"] as const).map((value) => ({ value, label: t(`recurrenceOption.${value}`) }))}
+            data={(["none", "weekly", "yearly"] as const).map((value) => ({
+              value,
+              label: t(`recurrenceOption.${value}`),
+            }))}
             onChange={(value) => {
               if (value) onChange({ ...event, recurrence: value as DateTimeEventRecurrence });
             }}
@@ -304,6 +307,7 @@ type EventListTranslationKey =
   | "unsupportedOption"
   | "recurrence"
   | "recurrenceOption.none"
+  | "recurrenceOption.weekly"
   | "recurrenceOption.yearly"
   | "target"
   | "trackProgress"
