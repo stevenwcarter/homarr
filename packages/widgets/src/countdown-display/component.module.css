@@ -1,0 +1,100 @@
+.root {
+  container-type: size;
+  overflow: hidden;
+}
+
+.hero {
+  min-width: 0;
+}
+
+.title {
+  max-width: 100%;
+}
+
+.status {
+  font-size: clamp(1.25rem, 12cqw, 3rem);
+}
+
+.tiles {
+  --countdown-cells: 6;
+  --countdown-scale: 1;
+  max-width: 100%;
+}
+
+.tile {
+  /* Auto-fit: share 84% of the container width across all digit cells, cap by height, then scale. */
+  font-size: max(1rem, calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), 42cqh)));
+  line-height: 1;
+}
+
+.numeral {
+  font-size: 1em;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.sevenSegment {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.glow {
+  text-shadow:
+    0 0 0.06em color-mix(in srgb, currentColor 45%, white),
+    0 0 0.35em color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.glow.sevenSegment {
+  text-shadow:
+    0 0 0.09em color-mix(in srgb, currentColor 45%, white),
+    0 0 0.5em color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.label {
+  font-size: max(0.7rem, 0.22em);
+  line-height: 1.2;
+  margin-top: 0.15em;
+  color: var(--mantine-color-dimmed);
+  white-space: nowrap;
+}
+
+.inline {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.inlineHost {
+  display: none;
+}
+
+.target {
+  max-width: 100%;
+}
+
+.eventCard {
+  min-width: 0;
+}
+
+@container (max-width: 8rem) {
+  .tilesHost {
+    display: none;
+  }
+
+  .inlineHost {
+    display: block;
+  }
+}
+
+@container (max-width: 11rem) {
+  .target {
+    display: none;
+  }
+}
+
+@container (max-height: 7rem) {
+  .target {
+    display: none;
+  }
+}
