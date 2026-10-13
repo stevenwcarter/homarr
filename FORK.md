@@ -74,6 +74,16 @@ v2.4.1 and unrelated to this widget. `bun run format` is the check form (`turbo 
 what CI runs); it may also flag upstream's `packages/widgets/src/rssFeed/component.tsx`, which is
 likewise pre-existing.
 
+Optional visual check of the layout and fonts against a locally built image (needs Docker; set
+`COUNTDOWN_SHOTS_DIR` to also write dark/light board screenshots):
+
+```bash
+HOMARR_E2E_IMAGE=192.168.42.134:5000/homarr:v2.4.1-countdown.1 NODE_ENV=development CI=true \
+  bun x vitest run --project e2e e2e/countdown-display.spec.ts
+```
+
+`HOMARR_E2E_IMAGE` must be set or the e2e helper throws.
+
 ## Build and push the image
 
 Tag scheme: `<upstream tag>-countdown.<n>`; `n` restarts at 1 for each upstream tag and increments for
