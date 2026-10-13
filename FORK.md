@@ -57,25 +57,47 @@ git push --force-with-lease origin countdown-display
 
 If upstream changed `packages/widgets/src/countdown/recurrence.ts` (we import `formatWallDateTime`,
 `parseWallDateTime`, `resolveWallDateTime`, `getCountdownEventState`, `getCountdownProgress`,
-`groupCountdownStates`), the typecheck and `duration.spec.ts` will say so.
+`groupCountdownStates`), the typecheck plus `duration.spec.ts` and `tiles.spec.tsx` will say so.
 
 ## Verification
 
 ```bash
 bun run test packages/widgets/src/countdown-display packages/widgets/src/test/translation.spec.ts
 bun run --filter @homarr/definitions --filter @homarr/ui --filter @homarr/widgets --filter @homarr/nextjs typecheck
-bun run --filter @homarr/widgets lint && bun run --filter @homarr/widgets format
+bun run --filter @homarr/widgets lint && bun run format
 bun run --filter @homarr/docs validate:coverage
 bun run check:openapi
 ```
+
+`translation.spec.ts` has one failure, the `rssFeed descriptionMaxLength` case. It is pre-existing at
+v2.4.1 and unrelated to this widget. `bun run format` is the check form (`turbo format -- --check`,
+what CI runs); it may also flag upstream's `packages/widgets/src/rssFeed/component.tsx`, which is
+likewise pre-existing.
 
 ## Build and push the image
 
 Tag scheme: `<upstream tag>-countdown.<n>`; `n` restarts at 1 for each upstream tag and increments for
 fork-only changes on the same upstream version.
 
+This machine's Docker daemon has no insecure-registries entry for the plain-HTTP registry, so the
+image is pushed through a buildx docker-container builder. One-time setup (`docker buildx rm
+homarr-fork` removes it):
+
 ```bash
-docker buildx build --platform linux/amd64 \
+# one-time: a builder that trusts the plain-HTTP registry (no daemon.json change needed)
+cat > ~/.config/homarr-fork-buildkitd.toml <<'EOT'
+[registry."192.168.42.134:5000"]
+  http = true
+  insecure = true
+EOT
+docker buildx create --name homarr-fork --driver docker-container --config ~/.config/homarr-fork-buildkitd.toml
+docker buildx inspect homarr-fork --bootstrap
+```
+
+Then build and push:
+
+```bash
+docker buildx build --builder homarr-fork --platform linux/amd64 \
   -t 192.168.42.134:5000/homarr:vNEW-countdown.1 --push .
 ```
 

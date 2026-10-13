@@ -50,10 +50,10 @@ Directory: `packages/widgets/src/countdown-display/`.
 | `units.ts` | `countdownUnits` tuple (descending), `CountdownUnit` type, default unit set, `normalizeUnits` (dedupe, order, empty → default). |
 | `duration.ts` | Pure calendar-aware breakdown: `getCountdownBreakdown(from, to, units, timeZone)` and `trimLeadingZeroParts`. No React. |
 | `duration.spec.ts` | Vitest cases listed under "Testing". |
-| `fonts.ts` | Font registry (key → CSS family, seven-segment flag) and the `@fontsource` CSS imports. |
+| `fonts.ts` | Font registry (key → CSS family, seven-segment flag). |
 | `tiles.tsx` | Presentational `CountdownTiles` (parts → tiles) and `CountdownInline` (parts → one line). No hooks beyond `useI18n`. |
 | `tiles.spec.tsx` | Render tests for padding, hidden leading zeros, font/glow classes. |
-| `component.tsx` | `CountdownDisplayWidget`: wires `useWidgetNow`, recurrence states, hero + advanced list. |
+| `component.tsx` | `CountdownDisplayWidget`: wires `useWidgetNow`, recurrence states, hero + advanced list; imports the five fontsource stylesheets. |
 | `component.module.css` | Container queries, tile sizing, font classes, glow. |
 
 Reused from the stock widget, imported from `../countdown/recurrence` (not copied):
@@ -140,8 +140,10 @@ packages self-host woff2 files; `bun install` fetches them from npm, nothing is 
 at build or run time, and each package carries its licence (OFL for all five; DSEG is OFL with
 reserved font name "DSEG").
 
-`fonts.ts` imports exactly these CSS files so the font chunks load with the widget, not the app
-shell (precedent: `video/component.tsx` imports `video.js/dist/video-js.css`):
+`component.tsx` imports exactly these CSS files (not `fonts.ts`: `index.ts` imports `fonts.ts` and the
+registry loads `index.ts` server-side, where a `.css` import would not resolve) so the font chunks load
+with the widget, not the app shell (precedent: `video/component.tsx` imports
+`video.js/dist/video-js.css`):
 `@fontsource-variable/jetbrains-mono/wght.css`, `@fontsource-variable/space-grotesk/wght.css`,
 `@fontsource/orbitron/700.css`, `@fontsource/bebas-neue/400.css`,
 `@fontsource/dseg7-classic/700.css`.
@@ -183,13 +185,15 @@ Hero (first event), rendered the same way in compact and advanced display modes:
 - Auto-fit: `.root` is a size container. The component sets `--countdown-cells` (sum over the
   tiles of `digits × 0.62 + 0.5` for the gap, a tunable constant) and `--countdown-scale`
   (`scale / 100`) as inline custom properties. The numeral font size is
-  `calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), 42cqh))`, clamped to a
-  minimum of `1rem`. Labels are `0.22em` of the numeral size, minimum `0.7rem`.
+  `calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), 30cqh))`, clamped to a
+  minimum of `1rem`. Labels are `0.22em` of the numeral size, minimum `0.6rem`.
 - Font: numerals get `style={{ fontFamily }}` from the registry (`undefined` for `default`), and
   the `.sevenSegment` class, which sets `font-weight: 700` and `letter-spacing: 0.04em`.
-- Glow: `.glow` applies
+- Glow: in the dark scheme `.glow` applies
   `text-shadow: 0 0 0.06em color-mix(in srgb, currentColor 45%, white), 0 0 0.35em color-mix(in srgb, currentColor 35%, transparent)`;
-  `.glow.sevenSegment` widens both radii by 1.5×.
+  in the light scheme (`[data-mantine-color-scheme="light"] .glow`) only the soft transparent layer
+  is kept, because a white core on dark text reads as a grey smudge. `.glow.sevenSegment` widens
+  the radii by 1.5× in both schemes.
 - Status: invalid event → "Unavailable" text in place of tiles; completed one-time event →
   "Completed" text (translated), no tiles. Empty event list → the same empty state copy pattern as
   the stock widget (hourglass icon, title, description).
@@ -319,10 +323,14 @@ Vitest, run through the root config: `bun run test -- packages/widgets/src/count
   shape changes upstream surface as type errors in `component.tsx`.
 - Next.js app router accepts global CSS imports from node_modules inside the transpiled
   `@homarr/widgets` package (`next.config` `transpilePackages`). Pinned today by
-  `video/component.tsx`; our `fonts.ts` adds five more. A build failure is the signal.
+  `video/component.tsx`; our `component.tsx` adds five more. A build failure is the signal.
 - `useWidgetNow("second")` re-renders once per second and pauses when the tab is hidden.
 - CSS `calc()` division by a unitless custom property, container query units (`cqw`, `cqh`) and
   `color-mix()` are available in the browsers Homarr targets (Chromium/Firefox/Safari current).
+- Each `getCountdownBreakdown` call costs about 2 ms (day/hour/minute/second) to 5 ms (all eight
+  units) on a desktop CPU because each calendar unit makes 2–3 `resolveWallDateTime` probes; the hero
+  recomputes once per tick, and every advanced-mode card does too. Memoizing the calendar stage per
+  minute is a documented follow-up, not implemented.
 
 ## Commit plan (one commit per task, conventional-commit style as upstream uses)
 
@@ -335,3 +343,8 @@ Vitest, run through the root config: `bun run test -- packages/widgets/src/count
    finalised, OpenAPI snapshot).
 6. `docs: fork maintenance guide` (`FORK.md`, README pointer).
 7. Image build + push; k8s-config commit (separate repo).
+
+## Follow-ups
+
+- Memoize the calendar stage of `getCountdownBreakdown` per minute (see the per-tick cost invariant
+  above); not implemented.
