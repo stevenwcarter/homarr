@@ -113,6 +113,31 @@ describe("getCountdownBreakdown", () => {
     expect(breakdown("2026-10-12T13:00:00.500Z", "2026-10-12T13:00:05.000Z", ["second"])).toEqual([["second", 4]]);
   });
 
+  it("counts a full day from the second pass of the fall-back hour", () => {
+    // 2026-11-01 01:30 EST (second pass of the repeated hour) + exactly 24 h.
+    expect(breakdown("2026-11-01T06:30:00.000Z", "2026-11-02T06:30:00.000Z", ["day", "hour"])).toEqual([
+      ["day", 1],
+      ["hour", 0],
+    ]);
+  });
+
+  it("counts a week across the fall-back change", () => {
+    // Oct 30 23:00 EDT -> Nov 6 23:00 EST is one calendar week (168 h + 1 h of clock change).
+    expect(breakdown("2026-10-31T03:00:00.000Z", "2026-11-07T04:00:00.000Z", ["week", "day", "hour"])).toEqual([
+      ["week", 1],
+      ["day", 0],
+      ["hour", 0],
+    ]);
+  });
+
+  it("steps a day into a spring-forward gap", () => {
+    // Mar 7 02:30 EST + 1 day = Mar 8 02:30, which does not exist and resolves to 03:30 EDT.
+    expect(breakdown("2026-03-07T07:30:00.000Z", "2026-03-08T07:30:00.000Z", ["day", "hour"])).toEqual([
+      ["day", 1],
+      ["hour", 0],
+    ]);
+  });
+
   it("steps months on the event zone's calendar", () => {
     // from = 2026-01-31 00:30 JST (still Jan 30 in UTC); to = 2026-02-28 09:30 JST.
     // On the Tokyo calendar that is one month (Jan 31 -> Feb 28, clamped) plus nine hours.

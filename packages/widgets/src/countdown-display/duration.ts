@@ -87,14 +87,13 @@ const toWall = (instant: Date, timeZone: string): WallDateTime =>
 const toInstantMs = (wall: WallDateTime, timeZone: string) =>
   resolveWallDateTime(wall, timeZone)?.getTime() ?? naiveUtcInstant(wall);
 
-const countWholeSteps = (
-  cursor: WallDateTime,
-  unit: CalendarUnit,
-  targetMs: number,
-  timeZone: string,
-  offsetMs: number,
-) => {
-  const instantOf = (count: number) => toInstantMs(addWallUnit(cursor, unit, count), timeZone) + offsetMs;
+/** Instant of `count` steps past the cursor; step 0 is the cursor's own exact instant. */
+const makeInstantOf =
+  (cursor: WallDateTime, cursorMs: number, unit: CalendarUnit, timeZone: string, subSecondMs: number) =>
+  (count: number) =>
+    count === 0 ? cursorMs : toInstantMs(addWallUnit(cursor, unit, count), timeZone) + subSecondMs;
+
+const countWholeSteps = (instantOf: (count: number) => number, unit: CalendarUnit, targetMs: number) => {
   let count = Math.max(0, Math.floor((targetMs - instantOf(0)) / approximateUnitMs[unit]));
   while (count > 0 && instantOf(count) > targetMs) count -= 1;
   while (instantOf(count + 1) <= targetMs) count += 1;
@@ -118,17 +117,24 @@ export const getCountdownBreakdown = (
 
   const parts: CountdownPart[] = [];
   let cursor = toWall(from, timeZone);
-  // Wall values have whole seconds; carry the sub-second remainder of `from` so it is never lost.
-  const offsetMs = from.getTime() - toInstantMs(cursor, timeZone);
+  // Wall values have whole seconds; carry the sub-second part of `from` so it is never lost.
+  const subSecondMs = from.getMilliseconds();
+  // The cursor's exact instant is tracked separately: in the repeated fall-back hour a wall value
+  // is ambiguous and would resolve to the first pass, skewing every probe by an hour.
+  let cursorMs = from.getTime();
 
   for (const unit of ordered) {
     if (!isCalendarUnit(unit)) continue;
-    const value = countWholeSteps(cursor, unit, targetMs, timeZone, offsetMs);
+    const instantOf = makeInstantOf(cursor, cursorMs, unit, timeZone, subSecondMs);
+    const value = countWholeSteps(instantOf, unit, targetMs);
     parts.push({ unit, value });
-    cursor = addWallUnit(cursor, unit, value);
+    if (value > 0) {
+      cursor = addWallUnit(cursor, unit, value);
+      cursorMs = instantOf(value);
+    }
   }
 
-  let remainingMs = targetMs - (toInstantMs(cursor, timeZone) + offsetMs);
+  let remainingMs = targetMs - cursorMs;
   for (const unit of ordered) {
     if (isCalendarUnit(unit)) continue;
     const unitMs = fixedUnitMs[unit];

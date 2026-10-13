@@ -104,6 +104,10 @@ describe("getCountdownCells", () => {
     expect(twoDigits).toBeGreaterThan(one);
     expect(twoTiles).toBeGreaterThan(twoDigits);
   });
+
+  it("never returns less than one cell", () => {
+    expect(getCountdownCells([])).toBe(1);
+  });
 });
 
 describe("CountdownInline", () => {

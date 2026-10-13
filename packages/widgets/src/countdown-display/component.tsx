@@ -88,7 +88,7 @@ export default function CountdownDisplayWidget({
   const eventColumns = width >= 700 ? 2 : 1;
   return (
     <Stack className={styles.root} h="100%" gap="md" p="md">
-      <Paper withBorder p="lg" radius="md" style={{ flex: "0 0 55%", minHeight: 0 }}>
+      <Paper withBorder p="lg" radius="md" style={{ flex: "0 0 55%", minHeight: 0, overflow: "hidden" }}>
         <CountdownHero
           state={hero}
           now={now}

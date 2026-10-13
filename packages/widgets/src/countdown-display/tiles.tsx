@@ -25,7 +25,10 @@ const formatTileValue = (part: CountdownPart) =>
 
 /** Approximate width of all tiles in numeral-em units; drives the CSS auto-fit font size. */
 export const getCountdownCells = (parts: CountdownPart[]) =>
-  parts.reduce((sum, part) => sum + formatTileValue(part).length * digitCellWidth + tileGapCells, 0);
+  Math.max(
+    1,
+    parts.reduce((sum, part) => sum + formatTileValue(part).length * digitCellWidth + tileGapCells, 0),
+  );
 
 export const CountdownTiles = ({ parts, numeral }: { parts: CountdownPart[]; numeral: CountdownNumeralStyle }) => {
   const t = useI18n("widget.countdownDisplay.unit");

@@ -34,14 +34,5 @@ const isCountdownFontKey = (key: string): key is CountdownFontKey =>
 export const getCountdownFont = (key: string): CountdownFont =>
   isCountdownFontKey(key) ? countdownFonts[key] : countdownFonts.default;
 
-/**
- * Self-hosted fontsource stylesheets backing the registry. `component.tsx` imports these literally
- * (bundlers need static specifiers); keep both lists in sync.
- */
-export const countdownFontCssImports = [
-  "@fontsource-variable/jetbrains-mono/wght.css",
-  "@fontsource-variable/space-grotesk/wght.css",
-  "@fontsource/orbitron/700.css",
-  "@fontsource/bebas-neue/400.css",
-  "@fontsource/dseg7-classic/700.css",
-] as const;
+// The fontsource stylesheets are imported in `component.tsx`, not here: this file is imported by
+// `index.ts`, which the widget registry loads server-side where a `.css` import would not resolve.

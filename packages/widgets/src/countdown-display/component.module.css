@@ -4,6 +4,7 @@
 }
 
 .hero {
+  container-type: size;
   min-width: 0;
 }
 
@@ -23,7 +24,7 @@
 
 .tile {
   /* Auto-fit: share 84% of the container width across all digit cells, cap by height, then scale. */
-  font-size: max(1rem, calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), 42cqh)));
+  font-size: max(1rem, calc(var(--countdown-scale) * min(calc(84cqw / var(--countdown-cells)), 30cqh)));
   line-height: 1;
 }
 
@@ -40,6 +41,7 @@
   letter-spacing: 0.04em;
 }
 
+/* Dark scheme: a bright core plus a soft halo. */
 .glow {
   text-shadow:
     0 0 0.06em color-mix(in srgb, currentColor 45%, white),
@@ -52,8 +54,17 @@
     0 0 0.5em color-mix(in srgb, currentColor 35%, transparent);
 }
 
+/* Light scheme: only the soft layer (a white core on dark text reads as a grey smudge). */
+[data-mantine-color-scheme="light"] .glow {
+  text-shadow: 0 0 0.35em color-mix(in srgb, currentColor 35%, transparent);
+}
+
+[data-mantine-color-scheme="light"] .glow.sevenSegment {
+  text-shadow: 0 0 0.5em color-mix(in srgb, currentColor 35%, transparent);
+}
+
 .label {
-  font-size: max(0.7rem, 0.22em);
+  font-size: max(0.6rem, 0.22em);
   line-height: 1.2;
   margin-top: 0.15em;
   color: var(--mantine-color-dimmed);
@@ -75,6 +86,10 @@
 
 .eventCard {
   min-width: 0;
+}
+
+.eventCard .inline {
+  white-space: normal;
 }
 
 @container (max-width: 8rem) {
