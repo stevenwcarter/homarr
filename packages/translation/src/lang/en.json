@@ -2735,6 +2735,25 @@
           "label": "Show progress"
         }
       },
+      "dateTimeEventList": {
+        "newEvent": "New event",
+        "add": "Add event",
+        "remove": "Remove {event}",
+        "reorder": "Reorder {event}",
+        "eventLabel": "Event label",
+        "timezone": "Timezone",
+        "unsupportedOption": "Unsupported: {timeZone}",
+        "recurrence": "Repeats",
+        "recurrenceOption": {
+          "none": "Does not repeat",
+          "yearly": "Every year"
+        },
+        "target": "Event date and time",
+        "trackProgress": "Track progress from a start date",
+        "start": "Progress start date and time",
+        "confirmDateTime": "Confirm date and time",
+        "limit": "{count} of {maximum} events configured"
+      },
       "font": {
         "default": "Dashboard font"
       },

@@ -30,7 +30,7 @@ Upstream files edited (conflicts land here):
 | `packages/definitions/src/docs/widget-doc-slugs.ts` | `countdownDisplay: "countdown-display"` | same |
 | `packages/definitions/src/docs/sitemap-paths.json` | `/docs/widgets/countdown-display` | keep both; then re-run `bun run --filter @homarr/definitions docs:generate` |
 | `packages/definitions/src/docs/homarr-docs-sitemap.ts` | generated | take upstream, re-run the generator |
-| `packages/translation/src/lang/en.json` | `widget.countdownDisplay` block after `widget.countdown` | keep both blocks; validate JSON |
+| `packages/translation/src/lang/en.json` | `widget.countdownDisplay` block after `widget.countdown` | keep both blocks; validate JSON. Must include a `dateTimeEventList` sub-block mirroring `widget.countdown.dateTimeEventList` (the event-list editor reads labels per widget kind; `translation.spec.ts` pins this) |
 | `package.json` (catalog), `packages/widgets/package.json`, `bun.lock` | five `@fontsource*` deps | keep both; run `bun install`, commit the lockfile |
 | `apps/docs/public/api/open-api-schema.json` | regenerated | take upstream, re-run `SKIP_ENV_VALIDATION=true bun run scripts:update-openapi` |
 | `README.md` | fork-only file (upstream v2.4.1 has no root README); if upstream re-adds one, keep our pointer at the top of theirs | keep ours at the top |

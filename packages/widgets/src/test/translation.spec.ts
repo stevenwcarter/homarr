@@ -73,3 +73,39 @@ describe("Widget properties should have matching name translations", () => {
       });
   }
 });
+
+// Keep in sync with EventListTranslationKey in _inputs/widget-date-time-event-list-input.tsx.
+const eventListTranslationKeys = [
+  "newEvent",
+  "add",
+  "remove",
+  "reorder",
+  "eventLabel",
+  "timezone",
+  "unsupportedOption",
+  "recurrence",
+  "recurrenceOption.none",
+  "recurrenceOption.yearly",
+  "target",
+  "trackProgress",
+  "start",
+  "confirmDateTime",
+  "limit",
+];
+
+describe("Widgets with a dateTimeEventList option should have the event list editor translations", () => {
+  for (const [key, definition] of widgetDefinitions) {
+    Object.entries(definition.createOptions({} as SettingsContextProps))
+      .filter(([, option]) => (option as { type?: string }).type === "dateTimeEventList")
+      .forEach(([optionKey]) => {
+        it(`should have widget.${key}.dateTimeEventList translations for the ${optionKey} option`, () => {
+          for (const translationKey of eventListTranslationKeys) {
+            expect(
+              getTranslationAtPath(`widget.${key}.dateTimeEventList.${translationKey}`),
+              `widget.${key}.dateTimeEventList.${translationKey}`,
+            ).toBeTypeOf("string");
+          }
+        });
+      });
+  }
+});
