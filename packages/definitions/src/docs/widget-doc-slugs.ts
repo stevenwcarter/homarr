@@ -6,6 +6,7 @@ export const widgetDocSlugs = {
   weather: "weather",
   airQuality: "air-quality",
   countdown: "countdown",
+  countdownDisplay: "countdown-display",
   timer: "timer",
   app: "app",
   iframe: "iframe",

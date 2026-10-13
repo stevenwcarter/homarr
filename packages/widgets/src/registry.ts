@@ -17,6 +17,7 @@ import type * as calendar from "./calendar";
 import type * as clock from "./clock";
 import type * as coolify from "./coolify";
 import type * as countdown from "./countdown";
+import type * as countdownDisplay from "./countdown-display";
 import type * as customApi from "./custom-api";
 import type * as dnsHoleControls from "./dns-hole/controls";
 import type * as dnsHoleSummary from "./dns-hole/summary";
@@ -76,6 +77,7 @@ export const widgetModuleLoaders = {
   clock: () => import("./clock"),
   airQuality: () => import("./air-quality"),
   countdown: () => import("./countdown"),
+  countdownDisplay: () => import("./countdown-display"),
   timer: () => import("./timer"),
   app: () => import("./app"),
   assistant: () => import("./assistant"),
@@ -148,6 +150,7 @@ export type WidgetImports = {
   clock: typeof clock;
   airQuality: typeof airQuality;
   countdown: typeof countdown;
+  countdownDisplay: typeof countdownDisplay;
   timer: typeof timer;
   app: typeof app;
   assistant: typeof assistant;
@@ -227,6 +230,7 @@ export const widgetComponentLoaders = {
   clock: () => import("./clock/component"),
   airQuality: () => import("./air-quality/component"),
   countdown: () => import("./countdown/component"),
+  countdownDisplay: () => import("./countdown-display/component"),
   timer: () => import("./timer/component"),
   app: () => import("./app/component"),
   assistant: () => import("./assistant/component"),

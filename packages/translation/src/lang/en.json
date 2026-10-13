@@ -2707,6 +2707,62 @@
         "reached": "The countdown has reached its target."
       }
     },
+    "countdownDisplay": {
+      "name": "Countdown display",
+      "description": "Large segmented countdown with selectable units and fonts.",
+      "option": {
+        "events": {
+          "label": "Events",
+          "description": "Add and order up to 20 one-time or yearly countdowns. Dates are entered in the selected timezone. The first event is shown large."
+        },
+        "units": {
+          "label": "Units shown",
+          "description": "Pick the units to display. Time from a hidden unit rolls into the next shown one."
+        },
+        "font": {
+          "label": "Numeral font",
+          "description": "Font for the numbers. Labels keep the dashboard font."
+        },
+        "scale": {
+          "label": "Size",
+          "description": "Scales the auto-fitted numerals, in percent."
+        },
+        "glow": {
+          "label": "Glow",
+          "description": "Adds a soft lighter glow behind the numbers."
+        },
+        "showProgress": {
+          "label": "Show progress"
+        }
+      },
+      "font": {
+        "default": "Dashboard font"
+      },
+      "unit": {
+        "decade": { "label": "Decades", "long": "{count, plural, one {decade} other {decades}}", "short": "dec" },
+        "year": { "label": "Years", "long": "{count, plural, one {year} other {years}}", "short": "yr" },
+        "month": { "label": "Months", "long": "{count, plural, one {month} other {months}}", "short": "mo" },
+        "week": { "label": "Weeks", "long": "{count, plural, one {week} other {weeks}}", "short": "wk" },
+        "day": { "label": "Days", "long": "{count, plural, one {day} other {days}}", "short": "d" },
+        "hour": { "label": "Hours", "long": "{count, plural, one {hour} other {hours}}", "short": "h" },
+        "minute": { "label": "Minutes", "long": "{count, plural, one {minute} other {minutes}}", "short": "min" },
+        "second": { "label": "Seconds", "long": "{count, plural, one {second} other {seconds}}", "short": "s" }
+      },
+      "empty": {
+        "title": "No countdowns yet",
+        "description": "Add an event in widget options to start counting down."
+      },
+      "completed": "Completed",
+      "yearly": "Yearly",
+      "progress": "Event progress",
+      "upcoming": "Upcoming",
+      "completedEvents": "Completed events",
+      "invalid": {
+        "title": "Some events cannot be displayed",
+        "description": "{count, plural, one {One event has an invalid date or unsupported timezone.} other {# events have an invalid date or unsupported timezone.}}",
+        "value": "Unavailable"
+      }
+    },
     "timer": {
       "name": "Timer / Pomodoro",
       "description": "Runs a simple timer or a configurable Pomodoro sequence.",

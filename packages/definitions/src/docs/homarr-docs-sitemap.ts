@@ -236,6 +236,7 @@ export type HomarrDocumentationPath =
   | "/docs/widgets/clock"
   | "/docs/widgets/coolify"
   | "/docs/widgets/countdown"
+  | "/docs/widgets/countdown-display"
   | "/docs/widgets/custom-api"
   | "/docs/widgets/dns-hole-controls"
   | "/docs/widgets/dns-hole-summary"

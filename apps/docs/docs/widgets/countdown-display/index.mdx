@@ -1,0 +1,31 @@
+---
+title: "Countdown display"
+description: "Large segmented countdown with selectable units and fonts."
+hide_title: true
+---
+
+import { WidgetInteractionGuide } from "@site/src/components/widgets/interactions";
+
+import { AddingWidget } from "@site/src/components/widgets/adding";
+import { WidgetConfig } from "@site/src/components/widgets/configuration";
+import { WidgetHeader } from "@site/src/components/widgets/header";
+import { countdownDisplayWidget } from ".";
+
+<WidgetHeader widget={countdownDisplayWidget} categories={["Time"]} />
+
+The Countdown display widget shows the first of up to 20 one-time or yearly events as large tiles, one per
+selected unit, and lists the remaining events in advanced view. Units are calendar-accurate in the event's
+timezone; hiding a unit rolls its time into the next shown unit. Seconds tick live when selected.
+
+Numerals auto-fit the tile and can be scaled, set in a bundled font (including a seven-segment face) and
+given a glow. Browser notifications are not part of this widget; use the Countdowns widget for those.
+
+<WidgetInteractionGuide />
+
+### Adding the widget
+
+<AddingWidget />
+
+### Configuration
+
+<WidgetConfig configuration={countdownDisplayWidget.configuration} />
