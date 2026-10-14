@@ -1,6 +1,5 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActionIcon, Box, Center, Group, Image, ScrollArea, Stack, Text, UnstyledButton } from "@mantine/core";
 import { useReducedMotion } from "@mantine/hooks";
@@ -18,20 +17,39 @@ import { useCurrentIntlLocale, useI18n } from "@homarr/translation/client";
 import { iconSizes } from "@homarr/ui";
 
 import { WidgetEmptyState } from "../../common/empty-state";
+import { useLocalWidgetState } from "../../common/use-local-widget-state";
 import type { WidgetComponentProps } from "../../definition";
 import { useWidgetRuntimeActions } from "../../runtime-hooks";
 import { getUsableWidgetQueryData } from "../../common/query-state";
 import classes from "./component.module.css";
 import { ALL_PHOTOS_ALBUM_ID } from "./constants";
+import { CarouselNavigation } from "./navigation";
+import { orderAssets, resolveCurrentIndex, stepAssetId } from "./order";
+import type { PhotoBackdrop, PhotoFit } from "./photo-stage";
+import { PhotoStage } from "./photo-stage";
+import type { SlideshowState } from "./slideshow-state";
+import {
+  createSlideshowState,
+  getSlideshowStateKey,
+  isSlideshowState,
+  SLIDESHOW_STATE_VERSION,
+} from "./slideshow-state";
 
 export default function ImmichAlbumCarouselWidget({
   integrationIds,
   options,
   displayMode = "compact",
   widgetRuntimeRef,
+  boardId,
+  itemId,
 }: WidgetComponentProps<"immich-albumCarousel">) {
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [slideshow, setSlideshow] = useLocalWidgetState<SlideshowState>({
+    key: getSlideshowStateKey(boardId, itemId),
+    storage: "session",
+    version: SLIDESHOW_STATE_VERSION,
+    defaultValue: createSlideshowState,
+    validate: isSlideshowState,
+  });
   const [firstPreviewPhoto, setFirstPreviewPhoto] = useState<{ albumId: string; assetId: string } | null>(null);
   let albumId: string | undefined;
   if (options.albumId && options.albumId !== ALL_PHOTOS_ALBUM_ID) albumId = options.albumId;
@@ -57,28 +75,35 @@ export default function ImmichAlbumCarouselWidget({
 
   const photoAssets = useMemo(() => {
     const assets = album?.assets.filter((asset) => asset.type === "IMAGE") ?? [];
-    if (!options.randomizePhotos) return assets;
-    const randomized = shuffle(assets);
-    if (!fullAlbum || !firstPreviewPhoto || firstPreviewPhoto.albumId !== albumId) return randomized;
-    const first = randomized.find((asset) => asset.id === firstPreviewPhoto.assetId);
-    if (!first) return randomized;
-    return [first, ...randomized.filter((asset) => asset.id !== first.id)];
-  }, [album?.assets, albumId, firstPreviewPhoto, fullAlbum, options.randomizePhotos]);
+    const firstAssetId =
+      options.randomizePhotos && fullAlbum && firstPreviewPhoto && firstPreviewPhoto.albumId === albumId
+        ? firstPreviewPhoto.assetId
+        : null;
+    return orderAssets(assets, { randomize: options.randomizePhotos, seed: slideshow.seed, firstAssetId });
+  }, [album?.assets, albumId, firstPreviewPhoto, fullAlbum, options.randomizePhotos, slideshow.seed]);
 
-  useEffect(() => {
-    if (photoAssets.length === 0) return;
-    setCurrentPhotoIndex((current) => Math.min(current, photoAssets.length - 1));
-  }, [photoAssets.length]);
-
-  const previousPhoto = useCallback(
-    () => setCurrentPhotoIndex((current) => (current - 1 + photoAssets.length) % photoAssets.length),
-    [photoAssets.length],
+  const setCurrentAssetId = useCallback(
+    (currentAssetId: string | null) => setSlideshow((current) => ({ ...current, currentAssetId })),
+    [setSlideshow],
   );
-  const nextPhoto = useCallback(
-    () => setCurrentPhotoIndex((current) => (current + 1) % photoAssets.length),
-    [photoAssets.length],
+  const moveBy = useCallback(
+    (offset: number) =>
+      setSlideshow((current) => ({
+        ...current,
+        currentAssetId: stepAssetId(photoAssets, current.currentAssetId, offset),
+      })),
+    [photoAssets, setSlideshow],
   );
-  const toggleSlideshow = useCallback(() => setPaused((value) => !value), []);
+  const previousPhoto = useCallback(() => moveBy(-1), [moveBy]);
+  const nextPhoto = useCallback(() => moveBy(1), [moveBy]);
+  const setPaused = useCallback(
+    (paused: boolean) => setSlideshow((current) => (current.paused === paused ? current : { ...current, paused })),
+    [setSlideshow],
+  );
+  const toggleSlideshow = useCallback(
+    () => setSlideshow((current) => ({ ...current, paused: !current.paused })),
+    [setSlideshow],
+  );
   useWidgetRuntimeActions(
     widgetRuntimeRef,
     photoAssets.length > 1 ? { previousPhoto, nextPhoto, toggleSlideshow } : {},
@@ -93,31 +118,24 @@ export default function ImmichAlbumCarouselWidget({
       ) : (
         <Carousel
           assets={photoAssets}
-          currentIndex={currentPhotoIndex}
-          setCurrentIndex={setCurrentPhotoIndex}
+          currentAssetId={slideshow.currentAssetId}
+          setCurrentAssetId={setCurrentAssetId}
+          moveBy={moveBy}
           rotationInterval={options.rotationIntervalSeconds}
           showPhotoInfo={options.showPhotoInfo}
+          showNavigationArrows={options.showNavigationArrows}
+          photoFit={options.photoFit}
+          backdrop={options.backdrop}
+          backdropColor={options.backdropColor}
           albumName={album.albumName}
           advanced={displayMode === "advanced"}
-          paused={paused}
+          paused={slideshow.paused}
           setPaused={setPaused}
+          toggleSlideshow={toggleSlideshow}
         />
       )}
     </Box>
   );
-}
-
-function shuffle<T>(items: T[]) {
-  const shuffled = [...items];
-  for (let index = shuffled.length - 1; index > 0; index--) {
-    const randomIndex = Math.floor(Math.random() * (index + 1));
-    const current = shuffled[index];
-    const random = shuffled[randomIndex];
-    if (current === undefined || random === undefined) continue;
-    shuffled[index] = random;
-    shuffled[randomIndex] = current;
-  }
-  return shuffled;
 }
 
 interface CarouselProps {
@@ -126,55 +144,68 @@ interface CarouselProps {
     fileModifiedAt: string;
     publicLink: string;
   }[];
-  currentIndex: number;
-  setCurrentIndex: Dispatch<SetStateAction<number>>;
+  currentAssetId: string | null;
+  setCurrentAssetId: (assetId: string | null) => void;
+  moveBy: (offset: number) => void;
   rotationInterval: number;
   showPhotoInfo: boolean;
+  showNavigationArrows: boolean;
+  photoFit: PhotoFit;
+  backdrop: PhotoBackdrop;
+  backdropColor: string;
   albumName: string;
   advanced: boolean;
   paused: boolean;
-  setPaused: Dispatch<SetStateAction<boolean>>;
+  setPaused: (paused: boolean) => void;
+  toggleSlideshow: () => void;
 }
 
 function Carousel({
   assets,
-  currentIndex,
-  setCurrentIndex,
+  currentAssetId,
+  setCurrentAssetId,
+  moveBy,
   rotationInterval,
   showPhotoInfo,
+  showNavigationArrows,
+  photoFit,
+  backdrop,
+  backdropColor,
   albumName,
   advanced,
   paused,
-  setPaused,
+  toggleSlideshow,
 }: CarouselProps) {
   const t = useI18n("widget.immich-albumCarousel");
   const locale = useCurrentIntlLocale();
   const reduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (paused || reduceMotion || assets.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % assets.length);
-    }, rotationInterval * 1000);
-
-    return () => clearInterval(interval);
-  }, [assets.length, paused, reduceMotion, rotationInterval, setCurrentIndex]);
-
-  const safeCurrentIndex = Math.min(currentIndex, assets.length - 1);
+  const safeCurrentIndex = resolveCurrentIndex(assets, currentAssetId);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const currentAsset = assets[safeCurrentIndex]!;
 
-  const move = (offset: number) => setCurrentIndex((current) => (current + offset + assets.length) % assets.length);
+  // Restarts whenever the shown photo changes, so every photo gets the full interval.
+  useEffect(() => {
+    if (paused || reduceMotion || assets.length <= 1) return;
+    const timeout = setTimeout(() => moveBy(1), rotationInterval * 1000);
+    return () => clearTimeout(timeout);
+  }, [assets.length, currentAsset.id, moveBy, paused, reduceMotion, rotationInterval]);
+
+  const arrows = showNavigationArrows && assets.length > 1;
 
   return (
     <Stack w="100%" h="100%" gap={0}>
       <Box w="100%" style={{ flex: 1, minHeight: 0 }} className={classes.carouselContainer}>
-        <Image
+        <PhotoStage
           src={currentAsset.publicLink}
           alt={t("albumPhoto")}
-          className={classes.carouselImage}
-          data-fit={advanced ? "contain" : "cover"}
+          fit={advanced ? "fit" : photoFit}
+          backdrop={backdrop}
+          backdropColor={backdropColor}
+          assetId={currentAsset.id}
         />
+
+        {arrows && <CarouselNavigation onPrevious={() => moveBy(-1)} onNext={() => moveBy(1)} />}
 
         {assets.length > 1 && (
           <Group
@@ -183,25 +214,26 @@ function Carousel({
             gap={4}
             wrap="nowrap"
           >
-            {advanced && (
+            {advanced && !arrows && (
               <ActionIcon
                 aria-label={t("actions.previousPhoto")}
                 variant="filled"
                 color="dark"
                 radius="xl"
                 size={40}
-                onClick={() => move(-1)}
+                onClick={() => moveBy(-1)}
               >
                 <IconChevronLeft size="var(--mantine-font-size-lg)" />
               </ActionIcon>
             )}
             <ActionIcon
               aria-label={paused ? t("actions.resumeSlideshow") : t("actions.pauseSlideshow")}
+              aria-pressed={paused}
               variant="filled"
               color="dark"
               radius="xl"
               size={advanced ? 40 : 32}
-              onClick={() => setPaused((value) => !value)}
+              onClick={toggleSlideshow}
             >
               {paused ? (
                 <IconPlayerPlay size="var(--mantine-font-size-lg)" />
@@ -209,14 +241,14 @@ function Carousel({
                 <IconPlayerPause size="var(--mantine-font-size-lg)" />
               )}
             </ActionIcon>
-            {advanced && (
+            {advanced && !arrows && (
               <ActionIcon
                 aria-label={t("actions.nextPhoto")}
                 variant="filled"
                 color="dark"
                 radius="xl"
                 size={40}
-                onClick={() => move(1)}
+                onClick={() => moveBy(1)}
               >
                 <IconChevronRight size="var(--mantine-font-size-lg)" />
               </ActionIcon>
@@ -247,7 +279,7 @@ function Carousel({
             {assets.map((asset, index) => (
               <UnstyledButton
                 key={asset.id}
-                onClick={() => setCurrentIndex(index)}
+                onClick={() => setCurrentAssetId(asset.id)}
                 aria-label={t("actions.photo", { number: index + 1 })}
                 aria-pressed={index === safeCurrentIndex}
                 aria-current={index === safeCurrentIndex ? "true" : undefined}
@@ -260,7 +292,7 @@ function Carousel({
                   h={44}
                   radius="sm"
                   fit="cover"
-                  style={{ opacity: index === currentIndex ? 1 : 0.55 }}
+                  style={{ opacity: index === safeCurrentIndex ? 1 : 0.55 }}
                 />
               </UnstyledButton>
             ))}

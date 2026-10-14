@@ -74,6 +74,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  isolation: isolate;
   background-color: var(--mantine-color-gray-8);
 }
 
@@ -99,8 +100,7 @@
 
 .navArrow {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: calc(50% - 20px);
   z-index: 2;
   opacity: 0;
   pointer-events: none;
@@ -125,8 +125,14 @@
   .navArrow {
     opacity: 1;
     pointer-events: auto;
+    top: calc(50% - 22px);
+  }
+
+  .carouselContainer .navArrow {
     width: 44px;
     height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
