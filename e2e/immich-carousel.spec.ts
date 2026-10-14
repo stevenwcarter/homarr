@@ -83,6 +83,19 @@ describe("immich album carousel", () => {
       await expect(stageOf(page, blurItemId)).toBeVisible({ timeout: 30_000 });
       await expect(stageOf(page, colorItemId)).toBeVisible({ timeout: 30_000 });
 
+      // The default slideshow state is persisted on first load, so a reload before any interaction keeps the photo.
+      const initialBlurAssetId = await assetIdOf(page, blurItemId);
+      expect(initialBlurAssetId).toBeTruthy();
+      const storedBeforeInteraction = await page.evaluate(
+        (itemId) =>
+          Object.entries(window.sessionStorage).find(([key]) => key.includes(`${itemId}:slideshow`))?.[1] ?? null,
+        blurItemId,
+      );
+      expect(storedBeforeInteraction).not.toBeNull();
+      await page.reload({ waitUntil: "load" });
+      await expect(stageOf(page, blurItemId)).toBeVisible({ timeout: 30_000 });
+      await expect(stageOf(page, blurItemId)).toHaveAttribute("data-asset-id", initialBlurAssetId ?? "");
+
       // Backdrops.
       await expect(page.locator(`[data-item-id="${blurItemId}"] [data-backdrop-layer="blur"]`)).toHaveCount(1);
       const blurFilter = await page
