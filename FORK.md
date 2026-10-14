@@ -7,10 +7,10 @@ Everything else is upstream, unmodified.
 
 ## Branch model
 
-| Remote | URL | Role |
-| --- | --- | --- |
-| `origin` | `git@github.com:stevenwcarter/homarr.git` | the fork; `countdown-display` lives here |
-| `upstream` | `https://github.com/homarr-labs/homarr.git` | read-only; release tags come from here |
+| Remote     | URL                                         | Role                                     |
+| ---------- | ------------------------------------------- | ---------------------------------------- |
+| `origin`   | `git@github.com:stevenwcarter/homarr.git`   | the fork; `countdown-display` lives here |
+| `upstream` | `https://github.com/homarr-labs/homarr.git` | read-only; release tags come from here   |
 
 Branch `countdown-display` is a short series of commits rebased on top of the upstream release tag that is
 deployed. It is force-pushed after every rebase. Never push to `upstream`.
@@ -23,22 +23,33 @@ Widget code (fork-only, never conflicts): `packages/widgets/src/countdown-displa
 Upstream files edited (conflicts land here). The weekly-recurrence rows touch the stock Countdowns
 widget's shared code on purpose: both widgets use the same event editor and resolver.
 
-| File | Our change | On conflict |
-| --- | --- | --- |
-| `packages/definitions/src/widget.ts` | `"countdownDisplay"` in `widgetKinds`; default size `3×2` | keep both sides' additions, keep ours after `"countdown"` |
-| `packages/widgets/src/registry.ts` | four `countdownDisplay` entries next to `countdown` | same |
-| `packages/ui/src/widget-icons.ts` | `countdownDisplay: IconHourglassHigh` | same |
-| `packages/definitions/src/docs/widget-doc-slugs.ts` | `countdownDisplay: "countdown-display"` | same |
-| `packages/definitions/src/docs/sitemap-paths.json` | `/docs/widgets/countdown-display` | keep both; then re-run `bun run --filter @homarr/definitions docs:generate` |
-| `packages/definitions/src/docs/homarr-docs-sitemap.ts` | generated | take upstream, re-run the generator |
-| `packages/translation/src/lang/en.json` | `widget.countdownDisplay` block after `widget.countdown` | keep both blocks; validate JSON. Must include a `dateTimeEventList` sub-block mirroring `widget.countdown.dateTimeEventList` (the event-list editor reads labels per widget kind; `translation.spec.ts` pins this) |
-| `package.json` (catalog), `packages/widgets/package.json`, `bun.lock` | five `@fontsource*` deps | keep both; run `bun install`, commit the lockfile |
-| `apps/docs/public/api/open-api-schema.json` | regenerated | take upstream, re-run `SKIP_ENV_VALIDATION=true bun run scripts:update-openapi` |
-| `packages/widgets/src/options.ts`, `packages/widgets/src/_inputs/widget-date-time-event-list-input.tsx` | `"weekly"` added to the `DateTimeEventRecurrence` type, zod enum, and the Repeats dropdown | keep `"weekly"` in every list; if upstream adds its own weekly recurrence, drop ours and adopt theirs |
-| `packages/widgets/src/countdown/recurrence.ts` | `findWeeklyOccurrence` + weekly branch in `getCountdownEventState`; progress uses previous/next for any recurrence | re-apply on top of upstream; `recurrence.spec.ts` weekly cases must pass |
-| `packages/widgets/src/countdown/component.tsx`, `packages/widgets/src/countdown/recurrence.spec.ts` | recurrence badge shows `t(recurrence)` for any non-`none` value; weekly tests | keep ours |
-| `apps/docs/docs/widgets/countdown/**` | "one-time, weekly, or yearly" wording | keep ours |
-| `README.md` | fork-only file (upstream v2.4.1 has no root README); if upstream re-adds one, keep our pointer at the top of theirs | keep ours at the top |
+| File                                                                                                    | Our change                                                                                                          | On conflict                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/definitions/src/widget.ts`                                                                    | `"countdownDisplay"` in `widgetKinds`; default size `3×2`                                                           | keep both sides' additions, keep ours after `"countdown"`                                                                                                                                                          |
+| `packages/widgets/src/registry.ts`                                                                      | four `countdownDisplay` entries next to `countdown`                                                                 | same                                                                                                                                                                                                               |
+| `packages/ui/src/widget-icons.ts`                                                                       | `countdownDisplay: IconHourglassHigh`                                                                               | same                                                                                                                                                                                                               |
+| `packages/definitions/src/docs/widget-doc-slugs.ts`                                                     | `countdownDisplay: "countdown-display"`                                                                             | same                                                                                                                                                                                                               |
+| `packages/definitions/src/docs/sitemap-paths.json`                                                      | `/docs/widgets/countdown-display`                                                                                   | keep both; then re-run `bun run --filter @homarr/definitions docs:generate`                                                                                                                                        |
+| `packages/definitions/src/docs/homarr-docs-sitemap.ts`                                                  | generated                                                                                                           | take upstream, re-run the generator                                                                                                                                                                                |
+| `packages/translation/src/lang/en.json`                                                                 | `widget.countdownDisplay` block after `widget.countdown`                                                            | keep both blocks; validate JSON. Must include a `dateTimeEventList` sub-block mirroring `widget.countdown.dateTimeEventList` (the event-list editor reads labels per widget kind; `translation.spec.ts` pins this) |
+| `package.json` (catalog), `packages/widgets/package.json`, `bun.lock`                                   | five `@fontsource*` deps                                                                                            | keep both; run `bun install`, commit the lockfile                                                                                                                                                                  |
+| `apps/docs/public/api/open-api-schema.json`                                                             | regenerated                                                                                                         | take upstream, re-run `SKIP_ENV_VALIDATION=true bun run scripts:update-openapi`                                                                                                                                    |
+| `packages/widgets/src/options.ts`, `packages/widgets/src/_inputs/widget-date-time-event-list-input.tsx` | `"weekly"` added to the `DateTimeEventRecurrence` type, zod enum, and the Repeats dropdown                          | keep `"weekly"` in every list; if upstream adds its own weekly recurrence, drop ours and adopt theirs                                                                                                              |
+| `packages/widgets/src/countdown/recurrence.ts`                                                          | `findWeeklyOccurrence` + weekly branch in `getCountdownEventState`; progress uses previous/next for any recurrence  | re-apply on top of upstream; `recurrence.spec.ts` weekly cases must pass                                                                                                                                           |
+| `packages/widgets/src/countdown/component.tsx`, `packages/widgets/src/countdown/recurrence.spec.ts`     | recurrence badge shows `t(recurrence)` for any non-`none` value; weekly tests                                       | keep ours                                                                                                                                                                                                          |
+| `apps/docs/docs/widgets/countdown/**`                                                                   | "one-time, weekly, or yearly" wording                                                                               | keep ours                                                                                                                                                                                                          |
+| `packages/widgets/src/immich/album-carousel/{index.ts,component.tsx,component.module.css}`              | arrows, photo fit, backdrop options; sessionStorage slideshow state; seeded order                                   | re-apply on top of upstream; `order.spec.ts`, `photo-stage.spec.tsx` and `e2e/immich-carousel.spec.ts` must pass                                                                                                   |
+| `packages/widgets/src/options.ts`, `packages/widgets/src/_inputs/index.ts`                              | `color` option type (`hexColorSchema`) and its input registration                                                   | keep ours; if upstream adds a colour option, adopt theirs and drop `widget-color-input.tsx`                                                                                                                        |
+| `packages/widgets/src/common/use-local-widget-state.ts`                                                 | optional `storage: "session"`                                                                                       | keep ours                                                                                                                                                                                                          |
+| `packages/translation/src/lang/en.json` (`widget.immich-albumCarousel`)                                 | four option entries plus `photoFit`/`backdrop` label blocks                                                         | keep both                                                                                                                                                                                                          |
+| `apps/docs/docs/widgets/immich-album-carousel/**`                                                       | option docs and behaviour paragraph                                                                                 | keep ours                                                                                                                                                                                                          |
+| `README.md`                                                                                             | fork-only file (upstream v2.4.1 has no root README); if upstream re-adds one, keep our pointer at the top of theirs | keep ours at the top                                                                                                                                                                                               |
+
+### Extracting a feature for upstream
+
+Commits are prefixed by feature: `feat(immich):`, `feat(widgets):`, `feat(countdown):`, `feat(countdown-display):`.
+To extract one feature, `git log --oneline v2.4.1..countdown-display -- <paths>` lists its commits; `git cherry-pick`
+them onto a branch created from `upstream/dev`.
 
 ## Updating to a new Homarr release
 
@@ -85,7 +96,12 @@ Optional visual check of the layout and fonts against a locally built image (nee
 ```bash
 HOMARR_E2E_IMAGE=192.168.42.134:5000/homarr:v2.4.1-countdown.1 NODE_ENV=development CI=true \
   bun x vitest run --project e2e e2e/countdown-display.spec.ts
+HOMARR_E2E_IMAGE=192.168.42.134:5000/homarr:v2.4.1-countdown.4 NODE_ENV=development CI=true \
+  bun x vitest run --project e2e e2e/immich-carousel.spec.ts
 ```
+
+The immich carousel e2e seeds a `mock` integration (the container runs with `UNSAFE_ENABLE_MOCK_INTEGRATION=true`)
+and asserts on DOM attributes only, since the mock album's photo URLs are external.
 
 `HOMARR_E2E_IMAGE` must be set or the e2e helper throws.
 
