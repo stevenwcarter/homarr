@@ -42,7 +42,9 @@ Added to `createOptions` in `index.ts`, after `randomizePhotos`:
 | `showNavigationArrows` | switch | `false` | never | "Navigation arrows" / "Show previous and next arrows on the sides of the photo while the pointer is over the widget." |
 | `photoFit` | select `cover` \| `fit` | `cover` | never | "Photo fit" / "Cover fills the tile and crops the photo. Fit shows the whole photo and fills the rest with the backdrop." |
 | `backdrop` | select `blur` \| `color` | `blur` | never | "Backdrop" / "What fills the space around a fitted photo and behind the focus view: a blurred copy of the photo, or a solid colour." |
-| `backdropColor` | color | `#000000` | `backdrop !== "color"` | "Backdrop colour" / "Solid colour shown around the photo when the backdrop is set to colour." |
+| `backdropColor` | color | `#000000` | never | "Backdrop colour" / "Solid colour shown around the photo when the backdrop is set to colour." |
+
+`backdropColor` is always visible because the edit modal validates hidden fields; hiding it could block saving on an invalid value.
 
 Select option labels are translated through the `SelectOption` label function form, as the Countdown
 display widget's `font` option does, with keys `widget.immich-albumCarousel.photoFit.{cover,fit}`

@@ -72,11 +72,7 @@ const createOptions = () =>
       defaultValue: "#000000",
       withDescription: true,
     }),
-  }), {
-    backdropColor: {
-      shouldHide: (options) => options.backdrop !== "color",
-    },
-  });
+  }));
 
 export const { definition, componentLoader } = createWidgetDefinition("immich-albumCarousel", {
   icon: IconPhoto,

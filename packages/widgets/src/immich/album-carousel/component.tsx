@@ -97,10 +97,6 @@ export default function ImmichAlbumCarouselWidget({
   );
   const previousPhoto = useCallback(() => moveBy(-1), [moveBy]);
   const nextPhoto = useCallback(() => moveBy(1), [moveBy]);
-  const setPaused = useCallback(
-    (paused: boolean) => setSlideshow((current) => (current.paused === paused ? current : { ...current, paused })),
-    [setSlideshow],
-  );
   const toggleSlideshow = useCallback(
     () => setSlideshow((current) => ({ ...current, paused: !current.paused })),
     [setSlideshow],
@@ -131,7 +127,6 @@ export default function ImmichAlbumCarouselWidget({
           albumName={album.albumName}
           advanced={displayMode === "advanced"}
           paused={slideshow.paused}
-          setPaused={setPaused}
           toggleSlideshow={toggleSlideshow}
         />
       )}
@@ -157,7 +152,6 @@ interface CarouselProps {
   albumName: string;
   advanced: boolean;
   paused: boolean;
-  setPaused: (paused: boolean) => void;
   toggleSlideshow: () => void;
 }
 
