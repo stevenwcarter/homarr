@@ -20,6 +20,8 @@ interface UseLocalWidgetStateOptions<T> {
   validate?: (value: unknown) => value is T;
   migrate?: (value: unknown, storedVersion: number) => T | undefined;
   storage?: WidgetStateStorage;
+  /** Write the default value to storage on first read so it survives a reload before any interaction. */
+  persistDefault?: boolean;
 }
 
 const resolveDefaultValue = <T>(value: T | (() => T)): T =>
@@ -60,6 +62,7 @@ export const useLocalWidgetState = <T>({
   validate,
   migrate,
   storage,
+  persistDefault = false,
 }: UseLocalWidgetStateOptions<T>): [T, Dispatch<SetStateAction<T>>, () => void] => {
   const defaultValueRef = useRef(defaultValue);
   const validateRef = useRef(validate);
@@ -95,20 +98,28 @@ export const useLocalWidgetState = <T>({
     try {
       const serialized = resolveWidgetStateStorage(storage).getItem(key);
       if (serialized === null) {
-        setMemoryValue(createDefaultValue());
+        const defaultState = createDefaultValue();
+        setMemoryValue(defaultState);
+        if (persistDefault) {
+          resolveWidgetStateStorage(storage).setItem(key, serializeLocalWidgetState(version, defaultState));
+        }
         return;
       }
       const parsed = parseLocalWidgetState(serialized, version, validateRef.current, migrateRef.current);
       if (parsed === undefined) {
         resolveWidgetStateStorage(storage).removeItem(key);
-        setMemoryValue(createDefaultValue());
+        const defaultState = createDefaultValue();
+        setMemoryValue(defaultState);
+        if (persistDefault) {
+          resolveWidgetStateStorage(storage).setItem(key, serializeLocalWidgetState(version, defaultState));
+        }
         return;
       }
       setMemoryValue(parsed);
     } catch {
       setMemoryValue(createDefaultValue());
     }
-  }, [createDefaultValue, key, setMemoryValue, storage, version]);
+  }, [createDefaultValue, key, persistDefault, setMemoryValue, storage, version]);
 
   useEffect(() => {
     if (!key) return;

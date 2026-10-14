@@ -49,6 +49,7 @@ export default function ImmichAlbumCarouselWidget({
     version: SLIDESHOW_STATE_VERSION,
     defaultValue: createSlideshowState,
     validate: isSlideshowState,
+    persistDefault: true,
   });
   const [firstPreviewPhoto, setFirstPreviewPhoto] = useState<{ albumId: string; assetId: string } | null>(null);
   let albumId: string | undefined;
