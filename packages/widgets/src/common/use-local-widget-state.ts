@@ -8,12 +8,18 @@ interface StoredWidgetState {
   value: unknown;
 }
 
+export type WidgetStateStorage = "local" | "session";
+
+export const resolveWidgetStateStorage = (storage?: WidgetStateStorage): Storage =>
+  storage === "session" ? window.sessionStorage : window.localStorage;
+
 interface UseLocalWidgetStateOptions<T> {
   key: string | undefined;
   version: number;
   defaultValue: T | (() => T);
   validate?: (value: unknown) => value is T;
   migrate?: (value: unknown, storedVersion: number) => T | undefined;
+  storage?: WidgetStateStorage;
 }
 
 const resolveDefaultValue = <T>(value: T | (() => T)): T =>
@@ -53,6 +59,7 @@ export const useLocalWidgetState = <T>({
   defaultValue,
   validate,
   migrate,
+  storage,
 }: UseLocalWidgetStateOptions<T>): [T, Dispatch<SetStateAction<T>>, () => void] => {
   const defaultValueRef = useRef(defaultValue);
   const validateRef = useRef(validate);
@@ -73,11 +80,11 @@ export const useLocalWidgetState = <T>({
   const removeStoredValue = useCallback(() => {
     if (!key) return;
     try {
-      window.localStorage.removeItem(key);
+      resolveWidgetStateStorage(storage).removeItem(key);
     } catch {
       // Storage can be unavailable in private or restricted browser contexts.
     }
-  }, [key]);
+  }, [key, storage]);
 
   useEffect(() => {
     if (!key) {
@@ -86,14 +93,14 @@ export const useLocalWidgetState = <T>({
     }
 
     try {
-      const serialized = window.localStorage.getItem(key);
+      const serialized = resolveWidgetStateStorage(storage).getItem(key);
       if (serialized === null) {
         setMemoryValue(createDefaultValue());
         return;
       }
       const parsed = parseLocalWidgetState(serialized, version, validateRef.current, migrateRef.current);
       if (parsed === undefined) {
-        window.localStorage.removeItem(key);
+        resolveWidgetStateStorage(storage).removeItem(key);
         setMemoryValue(createDefaultValue());
         return;
       }
@@ -101,13 +108,13 @@ export const useLocalWidgetState = <T>({
     } catch {
       setMemoryValue(createDefaultValue());
     }
-  }, [createDefaultValue, key, setMemoryValue, version]);
+  }, [createDefaultValue, key, setMemoryValue, storage, version]);
 
   useEffect(() => {
     if (!key) return;
 
     const handleStorage = (event: StorageEvent) => {
-      if (event.storageArea !== window.localStorage || event.key !== key) return;
+      if (event.storageArea !== resolveWidgetStateStorage(storage) || event.key !== key) return;
       if (event.newValue === null) {
         setMemoryValue(createDefaultValue());
         return;
@@ -118,7 +125,7 @@ export const useLocalWidgetState = <T>({
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [createDefaultValue, key, setMemoryValue, version]);
+  }, [createDefaultValue, key, setMemoryValue, storage, version]);
 
   const setValue: Dispatch<SetStateAction<T>> = useCallback(
     (nextValue) => {
@@ -128,13 +135,13 @@ export const useLocalWidgetState = <T>({
       setMemoryValue(resolved);
       if (key) {
         try {
-          window.localStorage.setItem(key, serializeLocalWidgetState(version, resolved));
+          resolveWidgetStateStorage(storage).setItem(key, serializeLocalWidgetState(version, resolved));
         } catch {
           // Keep the in-memory state usable when persistence is unavailable.
         }
       }
     },
-    [key, setMemoryValue, version],
+    [key, setMemoryValue, storage, version],
   );
 
   const resetValue = useCallback(() => {

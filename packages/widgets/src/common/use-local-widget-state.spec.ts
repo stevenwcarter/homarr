@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseLocalWidgetState, serializeLocalWidgetState } from "./use-local-widget-state";
+import { parseLocalWidgetState, resolveWidgetStateStorage, serializeLocalWidgetState } from "./use-local-widget-state";
 
 const isCounterState = (value: unknown): value is { count: number } =>
   typeof value === "object" && value !== null && "count" in value && typeof value.count === "number";
@@ -24,5 +24,13 @@ describe("local widget state serialization", () => {
         return { count: Number(value.oldCount) };
       }),
     ).toEqual({ count: 4 });
+  });
+});
+
+describe("resolveWidgetStateStorage", () => {
+  it("returns session storage for 'session' and local storage otherwise", () => {
+    expect(resolveWidgetStateStorage("session")).toBe(window.sessionStorage);
+    expect(resolveWidgetStateStorage("local")).toBe(window.localStorage);
+    expect(resolveWidgetStateStorage(undefined)).toBe(window.localStorage);
   });
 });
