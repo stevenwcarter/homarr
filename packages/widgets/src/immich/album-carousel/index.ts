@@ -48,7 +48,35 @@ const createOptions = () =>
       defaultValue: false,
       withDescription: true,
     }),
-  }));
+    showNavigationArrows: factory.switch({
+      defaultValue: false,
+      withDescription: true,
+    }),
+    photoFit: factory.select({
+      defaultValue: "cover",
+      options: [
+        { value: "cover", label: (t) => t("widget.immich-albumCarousel.photoFit.cover") },
+        { value: "fit", label: (t) => t("widget.immich-albumCarousel.photoFit.fit") },
+      ],
+      withDescription: true,
+    }),
+    backdrop: factory.select({
+      defaultValue: "blur",
+      options: [
+        { value: "blur", label: (t) => t("widget.immich-albumCarousel.backdrop.blur") },
+        { value: "color", label: (t) => t("widget.immich-albumCarousel.backdrop.color") },
+      ],
+      withDescription: true,
+    }),
+    backdropColor: factory.color({
+      defaultValue: "#000000",
+      withDescription: true,
+    }),
+  }), {
+    backdropColor: {
+      shouldHide: (options) => options.backdrop !== "color",
+    },
+  });
 
 export const { definition, componentLoader } = createWidgetDefinition("immich-albumCarousel", {
   icon: IconPhoto,

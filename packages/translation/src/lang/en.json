@@ -4209,6 +4209,22 @@
         "randomizePhotos": {
           "label": "Randomize photos",
           "description": "Show photos in a random order instead of always starting with the same album order."
+        },
+        "showNavigationArrows": {
+          "label": "Navigation arrows",
+          "description": "Show previous and next arrows on the sides of the photo while the pointer is over the widget."
+        },
+        "photoFit": {
+          "label": "Photo fit",
+          "description": "Cover fills the tile and crops the photo. Fit shows the whole photo and fills the rest with the backdrop."
+        },
+        "backdrop": {
+          "label": "Backdrop",
+          "description": "What fills the space around a fitted photo and behind the focus view: a blurred copy of the photo, or a solid colour."
+        },
+        "backdropColor": {
+          "label": "Backdrop colour",
+          "description": "Solid colour shown around the photo when the backdrop is set to colour."
         }
       },
       "description": "Slideshow of pictures from an Immich album or your full library",
@@ -4221,7 +4237,9 @@
         "resumeSlideshow": "Resume slideshow",
         "toggleSlideshow": "Pause or resume slideshow",
         "photo": "Photo {number}"
-      }
+      },
+      "photoFit": { "cover": "Cover", "fit": "Fit" },
+      "backdrop": { "blur": "Blurred photo", "color": "Solid colour" }
     },
     "downloads": {
       "name": "Download Client",

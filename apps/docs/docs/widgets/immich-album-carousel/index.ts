@@ -33,6 +33,30 @@ export const immichAlbumCarouselWidget: WidgetDefinition = {
         values: { type: "boolean" },
         defaultValue: "no",
       },
+      {
+        name: "Navigation arrows",
+        description: "Show previous and next arrows on the sides of the photo while the pointer is over the widget.",
+        values: { type: "boolean" },
+        defaultValue: "no",
+      },
+      {
+        name: "Photo fit",
+        description: "Cover fills the tile and crops the photo. Fit shows the whole photo and fills the rest with the backdrop.",
+        values: { type: "string" },
+        defaultValue: "Cover",
+      },
+      {
+        name: "Backdrop",
+        description: "What fills the space around a fitted photo and behind the focus view: a blurred copy of the photo, or a solid colour.",
+        values: { type: "string" },
+        defaultValue: "Blurred photo",
+      },
+      {
+        name: "Backdrop colour",
+        description: "Solid colour shown around the photo when the backdrop is set to colour.",
+        values: { type: "string" },
+        defaultValue: "#000000",
+      },
     ],
   },
 };
