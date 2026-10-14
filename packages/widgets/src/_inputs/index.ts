@@ -1,6 +1,7 @@
 import type { WidgetOptionType } from "../options";
 import { WidgetAnchorNoteInput } from "./widget-anchor-note-input";
 import { WidgetAppInput } from "./widget-app-input";
+import { WidgetColorInput } from "./widget-color-input";
 import { WidgetCustomWidgetSelectInput } from "./widget-custom-widget-select-input";
 import { WidgetCustomWidgetConfigurationInput } from "./widget-custom-widget-configuration-input";
 import { WidgetDateTimeEventListInput } from "./widget-date-time-event-list-input";
@@ -31,6 +32,7 @@ const mapping = {
   internal: WidgetInternalInput,
   anchorNote: WidgetAnchorNoteInput,
   text: WidgetTextInput,
+  color: WidgetColorInput,
   dateTimeEventList: WidgetDateTimeEventListInput,
   timezoneList: WidgetTimezoneListInput,
   location: WidgetLocationInput,

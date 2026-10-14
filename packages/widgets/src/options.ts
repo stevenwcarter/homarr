@@ -12,6 +12,8 @@ import type { DynamicSelectOption } from "./_inputs/widget-dynamic-select-input"
 import type { inferSelectOptionValue, SelectOption } from "./_inputs/widget-select-input";
 import type { ReleasesRepository } from "./releases/releases-repository";
 
+export const hexColorSchema = z.string().regex(/^#[0-9a-f]{6}$/i);
+
 interface CommonInput<TType> {
   defaultValue?: TType;
   withDescription?: boolean;
@@ -167,6 +169,12 @@ const optionsFactory = {
     defaultValue: input?.defaultValue ?? "",
     withDescription: input?.withDescription ?? false,
     validate: input?.validate,
+  }),
+  color: (input?: CommonInput<string>) => ({
+    type: "color" as const,
+    defaultValue: input?.defaultValue ?? "#000000",
+    withDescription: input?.withDescription ?? false,
+    validate: hexColorSchema,
   }),
   anchorNote: (input?: AnchorNoteInput) => ({
     type: "anchorNote" as const,
